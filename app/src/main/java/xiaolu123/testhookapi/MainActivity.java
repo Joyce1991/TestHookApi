@@ -2,6 +2,8 @@ package xiaolu123.testhookapi;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
@@ -15,6 +17,9 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import java.io.File;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -32,6 +37,7 @@ public class MainActivity extends Activity {
     private TextView language;
     private TextView network;
     private TextView root;
+    private TextView appList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +57,7 @@ public class MainActivity extends Activity {
         language = (TextView) findViewById(R.id.language);
         network = (TextView) findViewById(R.id.network);
         root = (TextView) findViewById(R.id.isroot);
+        appList = (TextView) findViewById(R.id.appList);
 
         Log.e("zyr", "onCreate");
 
@@ -71,12 +78,12 @@ public class MainActivity extends Activity {
         language.setText(getLanguage());
         network.setText(getNetworkType());
         root.setText(String.valueOf(isRoot()));
+        appList.setText(getInstalledApps().toString());
     }
 
     /** 判断是否具有ROOT权限 ,此方法对有些手机无效，比如小米系列 */
     private boolean isRoot() {
         boolean res = false;
-
         try {
             if ((!new File("/system/bin/su").exists())
                     && (!new File("/system/xbin/su").exists())) {
@@ -84,7 +91,6 @@ public class MainActivity extends Activity {
             } else {
                 res = true;
             }
-            ;
         } catch (Exception e) {
             res = false;
         }
@@ -158,5 +164,31 @@ public class MainActivity extends Activity {
         } catch (Exception e) {
             return "";
         }
+    }
+
+    /**
+     * 获取用户安装的app列表，不包含
+     * @return 包名列表
+     */
+    public List<String> getInstalledApps(){
+        try {
+            Class class_package = Class.forName("android.content.pm.PackageParser$Package");
+            class_package.getMethod("setPackageName", String.class);
+        } catch (Exception e) {
+            Log.e("joyce", e.getMessage());
+        }
+        ArrayList<String> appNameList = new ArrayList<String>();
+        PackageManager pm = getPackageManager();
+        List<ApplicationInfo> apps = pm.getInstalledApplications(0);
+        for(ApplicationInfo app : apps) {
+            if((app.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0) {
+                appNameList.add(app.packageName);
+            } else if ((app.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
+                // 系统app
+            } else {
+                appNameList.add(app.packageName);
+            }
+        }
+        return appNameList;
     }
 }
