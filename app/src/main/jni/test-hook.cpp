@@ -5,6 +5,17 @@
 #define LOGI(...)  __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
+/**
+ 1. http://www.cnblogs.com/baizx/p/4254359.html
+ 2. http://blog.csdn.net/jianwei824/article/details/6091387
+ 3. http://blog.csdn.net/hu3167343/article/details/50792153
+ 4. https://github.com/myCodeHurts/Plum---Android-Native-Cydia-Substrate
+ 5. http://www.cydiasubstrate.com/inject/android/
+ 6. http://bbs.pediy.com/showthread.php?t=213043&highlight=substrate
+ 7. https://github.com/ele7enxxh/Android-Inline-Hook
+ 8. http://androidxref.com/6.0.1_r10/xref/bionic/libc/bionic/open.cpp
+**/
+
 MSConfig(MSFilterLibrary, "/system/lib/libc.so")
 
 static jint (*_Resources$getColor)(JNIEnv *jni, jobject _this, ...);
