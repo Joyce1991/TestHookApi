@@ -32,10 +32,10 @@ int hookopen(const char* pathname, int flags, ...){
     char *su_8 = "/system/bin/failsafe/su";
     char *su_9 = "/data/local/su";
     char *su_0 = "/su/bin/su";
-    if (strcasecmp(pathname, su_0) || strcasecmp(pathname, su_1) || strcasecmp(pathname, su_2) || strcasecmp(pathname, su_3)
-            || strcasecmp(pathname, su_4) || strcasecmp(pathname, su_5) || strcasecmp(pathname, su_6)
-            || strcasecmp(pathname, su_7) || strcasecmp(pathname, su_8) || strcasecmp(pathname, su_9)){
-        LOGI("match condition, return -1");
+    if (strcasecmp(pathname, su_0)==0 || strcasecmp(pathname, su_1)==0 || strcasecmp(pathname, su_2)==0 || strcasecmp(pathname, su_3)==0
+            || strcasecmp(pathname, su_4)==0 || strcasecmp(pathname, su_5)==0 || strcasecmp(pathname, su_6)==0
+            || strcasecmp(pathname, su_7)==0 || strcasecmp(pathname, su_8)==0 || strcasecmp(pathname, su_9)==0){
+        LOGI("match condition, return -1, %s", pathname);
         return -1;
     }
     return open(pathname,flags);

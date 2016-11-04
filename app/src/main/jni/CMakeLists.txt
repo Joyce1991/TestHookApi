@@ -13,7 +13,7 @@ set_target_properties(lib_substrate-dvm PROPERTIES IMPORTED_LOCATION
 ##################################################################
 
 add_library(test-hook.cy SHARED
-            test-hook.cpp)
+            test-hook.cpp mainactivity.c)
 
 # Include libraries needed for hello-jni lib
 target_link_libraries(test-hook.cy log android lib_substrate)

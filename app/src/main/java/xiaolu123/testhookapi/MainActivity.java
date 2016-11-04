@@ -191,4 +191,6 @@ public class MainActivity extends Activity {
         }
         return appNameList;
     }
+
+    private native boolean isRootByNative();
 }

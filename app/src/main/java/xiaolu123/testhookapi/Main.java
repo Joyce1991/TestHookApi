@@ -129,7 +129,7 @@ public class Main {
             }
         });
 
-        MS.hookClassLoad("java.io.File", new MS.ClassLoadHook(){
+/*        MS.hookClassLoad("java.io.File", new MS.ClassLoadHook(){
             @Override
             public void classLoaded(Class<?> aClass) {
                 Log.i("joyce", "File cloadLoaded");
@@ -160,7 +160,7 @@ public class Main {
                     }, old);
                 }
             }
-        });
+        });*/
 
         MS.hookClassLoad("android.content.pm.PackageParser", new MS.ClassLoadHook(){
             @Override
