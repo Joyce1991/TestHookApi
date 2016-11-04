@@ -1,5 +1,5 @@
 #include <android/log.h>
-#include "substrate.h"
+#include <substrate.h>
 
 #define LOG_TAG "joyce_native"
 #define LOGI(...)  __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
@@ -16,17 +16,12 @@
  8. http://androidxref.com/6.0.1_r10/xref/bionic/libc/bionic/open.cpp
 **/
 
-MSConfig(MSFilterLibrary, "/system/lib/libc.so")
-
-static jint (*_Resources$getColor)(JNIEnv *jni, jobject _this, ...);
-
-static jint $Resources$getColor(JNIEnv *jni, jobject _this, jint rid) {
-    jint color = _Resources$getColor(jni, _this, rid);
-    return color & ~0x0000ff00 | 0x00ff0000;
-}
+// The name (last path component) of a library the developer is attempting to hook. As an example, to hook __android_log, specify "liblog.so".
+MSConfig(MSFilterLibrary, "libc.so")
 
 int (*open)(const char*, int, ...); // 保留原来的地址（就是MSHookFunction调用后会把原来的地址保存在了这里）
 int hookopen(const char* pathname, int flags, ...){
+    LOGI("method hooked");
     char *su_1 = "/system/app/Superuser.apk";
     char *su_2 = "/sbin/su";
     char *su_3 = "/system/bin/su";
@@ -40,6 +35,7 @@ int hookopen(const char* pathname, int flags, ...){
     if (strcasecmp(pathname, su_0) || strcasecmp(pathname, su_1) || strcasecmp(pathname, su_2) || strcasecmp(pathname, su_3)
             || strcasecmp(pathname, su_4) || strcasecmp(pathname, su_5) || strcasecmp(pathname, su_6)
             || strcasecmp(pathname, su_7) || strcasecmp(pathname, su_8) || strcasecmp(pathname, su_9)){
+        LOGI("match condition, return -1");
         return -1;
     }
     return open(pathname,flags);
@@ -55,6 +51,7 @@ MSInitialize {
         if(openload==NULL){
             LOGE("error find open ");
         } else{
+            LOGI("find open from libc.so");
             MSHookFunction(openload, (void*)&hookopen,(void**)&open);
         }
     } else{

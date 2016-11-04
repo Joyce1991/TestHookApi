@@ -32,7 +32,7 @@ android {
         arm7 {
             // in the future, ndk.abiFilter might also work
             ndk {
-                abiFilter 'armeabi-v7a'
+                abiFilter 'armeabi'
             }
         }
     }
