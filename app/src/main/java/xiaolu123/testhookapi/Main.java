@@ -1,5 +1,6 @@
 package xiaolu123.testhookapi;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.pm.ApplicationInfo;
 import android.net.ConnectivityManager;
 import android.telephony.TelephonyManager;
@@ -11,7 +12,6 @@ import com.saurik.substrate.MS;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.List;
 
 public class Main {
     public static final String GET_INSTALLED_APPLICATIONS = "getInstalledApplications";
@@ -83,53 +83,11 @@ public class Main {
             }
         });
 
-        MS.hookClassLoad("android.net.wifi.WifiInfo", new MS.ClassLoadHook() {
-            public void classLoaded(Class<?> resources) {
-                Method method;
+        HookTool.simpleHookMethod("android.net.wifi.WifiInfo", "getMacAddress", "1234567879");
+        HookTool.simpleHookMethod("android.telephony.TelephonyManager", "getDeviceId", "520027-19-012435-8-05");
+        HookTool.simpleHookMethod("com.android.internal.telephony.PhoneSubInfo", "getDeviceId", "520027-19-012435-8-05");
 
-                try {
-                    method = resources.getMethod("getMacAddress");
-                } catch (Exception e) {
-                    method = null;
-                }
-
-                if (method != null) {
-                    final MS.MethodPointer old = new MS.MethodPointer();
-
-                    MS.hookMethod(resources, method, new MS.MethodHook() {
-                        public Object invoked(Object resources, Object... args) throws Throwable {
-                            return "1234567879";
-                        }
-                    }, old);
-                }
-            }
-        });
-
-        MS.hookClassLoad("android.telephony.TelephonyManager", new MS.ClassLoadHook() {
-            public void classLoaded(Class<?> resources) {
-                Log.i("joyce","TelephonyManager classLoaded");
-                Method method;
-
-                try {
-                    method = resources.getMethod("getDeviceId");
-                } catch (Exception e) {
-                    method = null;
-                }
-
-                if (method != null) {
-                    final MS.MethodPointer old = new MS.MethodPointer();
-
-                    MS.hookMethod(resources, method, new MS.MethodHook() {
-                        public Object invoked(Object resources, Object... args) throws Throwable {
-                            Log.i("joyce","TelephonyManager hookMethod");
-                            return "0987654321";
-                        }
-                    }, old);
-                }
-            }
-        });
-
-/*        MS.hookClassLoad("java.io.File", new MS.ClassLoadHook(){
+        MS.hookClassLoad("java.io.File", new MS.ClassLoadHook() {
             @Override
             public void classLoaded(Class<?> aClass) {
                 Log.i("joyce", "File cloadLoaded");
@@ -140,18 +98,18 @@ public class Main {
                     method = null;
                     Log.e("joyce", e.getMessage());
                 }
-
                 if (method != null) {
                     Log.i("joyce", "File exists methodLoaded");
                     final MS.MethodPointer old = new MS.MethodPointer();
-                    MS.hookMethod(aClass, method, new MS.MethodHook(){
+                    MS.hookMethod(aClass, method, new MS.MethodHook() {
                         @Override
                         public Object invoked(Object o, Object... objects) throws Throwable {
-                            String[] paths = { "/system/app/Superuser.apk", "/sbin/su", "/system/bin/su", "/system/xbin/su", "/data/local/xbin/su", "/data/local/bin/su", "/system/sd/xbin/su",
+                            String[] paths = {"/system/app/Superuser.apk", "/sbin/su", "/system/bin/su",
+                                    "/system/xbin/su", "/data/local/xbin/su", "/data/local/bin/su", "/system/sd/xbin/su",
                                     "/system/bin/failsafe/su", "/data/local/su", "/su/bin/su"};
                             File file = (File) o;
-                            for (String path : paths){
-                                if (path.equals(file.getPath())){
+                            for (String path : paths) {
+                                if (path.equals(file.getPath())) {
                                     return false;
                                 }
                             }
@@ -160,12 +118,12 @@ public class Main {
                     }, old);
                 }
             }
-        });*/
+        });
 
-        MS.hookClassLoad("android.content.pm.PackageParser", new MS.ClassLoadHook(){
+        MS.hookClassLoad("android.content.pm.PackageParser", new MS.ClassLoadHook() {
             @Override
             public void classLoaded(Class<?> aClass) {
-                Log.i("joyce","PackageParser classLoaded");
+                Log.i("joyce", "PackageParser classLoaded");
                 Method method = null;
                 try {
                     Class class_package = Class.forName("android.content.pm.PackageParser$Package");
@@ -173,19 +131,19 @@ public class Main {
                     method = aClass.getMethod("generateApplicationInfo", class_package, int.class, class_PackageUserState, int.class);
                 } catch (Exception e) {
                     method = null;
-                    Log.i("joyce","generateApplicationInfo not be found, " + e.getMessage());
+                    Log.i("joyce", "generateApplicationInfo not be found, " + e.getMessage());
                 }
-                if (method != null){
-                    Log.i("joyce","PackageManager generateApplicationInfo be found");
+                if (method != null) {
+                    Log.i("joyce", "PackageManager generateApplicationInfo be found");
                     final MS.MethodPointer old = new MS.MethodPointer();
                     MS.hookMethod(aClass, method, new MS.MethodHook() {
                         public Object invoked(Object resources, Object... args) throws Throwable {
-                            Log.i("joyce","PackageManager hookMethod");
+                            Log.i("joyce", "PackageManager hookMethod");
                             ApplicationInfo info = (ApplicationInfo) old.invoke(resources, args);
                             Log.i("joyce", "packagename: " + info.packageName);
-                          if(info.packageName.equals("com.jojo.readtopactivity")){
-                              info.packageName = "com.zhang.joyce";
-                          }
+                            if (info.packageName.equals("com.jojo.readtopactivity")) {
+                                info.packageName = "com.zhang.joyce";
+                            }
                             return info;
                         }
                     }, old);
@@ -240,6 +198,7 @@ public class Main {
                 }
             });
 
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
     }
 }

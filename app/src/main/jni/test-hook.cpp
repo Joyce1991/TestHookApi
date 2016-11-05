@@ -6,6 +6,7 @@
 #define LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
 /**
+ 拓展阅读：
  1. http://www.cnblogs.com/baizx/p/4254359.html
  2. http://blog.csdn.net/jianwei824/article/details/6091387
  3. http://blog.csdn.net/hu3167343/article/details/50792153
@@ -19,7 +20,8 @@
 // The name (last path component) of a library the developer is attempting to hook. As an example, to hook __android_log, specify "liblog.so".
 MSConfig(MSFilterLibrary, "libc.so")
 
-int (*open)(const char*, int, ...); // 保留原来的地址（就是MSHookFunction调用后会把原来的地址保存在了这里）
+// 保留原来的地址（就是MSHookFunction调用后会把原来的地址保存在了这里）
+int (*open)(const char*, int, ...);
 int hookopen(const char* pathname, int flags, ...){
     LOGI("method hooked");
     char *su_1 = "/system/app/Superuser.apk";
