@@ -13,8 +13,13 @@ import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.WindowManager;
 import android.widget.TextView;
+
+import com.umeng.analytics.MobclickAgent;
+
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -23,7 +28,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+import static android.telephony.TelephonyManager.PHONE_TYPE_CDMA;
+import static android.telephony.TelephonyManager.PHONE_TYPE_GSM;
+
 public class MainActivity extends Activity {
+    private final String mPageName = "AnalyticsHome";
     private TextView uid;
     private TextView model;
     private TextView manufacturer;
@@ -38,10 +47,29 @@ public class MainActivity extends Activity {
     private TextView network;
     private TextView root;
     private TextView appList;
+    private TextView any;
+    private TextView location;
+    private TextView gsmLocation;
+    private TextView build;
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK){
+            finish();
+        }
+        return super.dispatchKeyEvent(event);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        File file = this.getFilesDir();
+        String filePath = file.getPath();
+        Log.i("joyce", filePath);
+
+/*        MobclickAgent.setDebugMode(true);
+        MobclickAgent.openActivityDurationTrack(false);
+        MobclickAgent.setScenarioType(this, MobclickAgent.EScenarioType.E_UM_NORMAL);*/
         setContentView(R.layout.activity_main);
 
         uid = (TextView) findViewById(R.id.uuid);
@@ -58,6 +86,10 @@ public class MainActivity extends Activity {
         network = (TextView) findViewById(R.id.network);
         root = (TextView) findViewById(R.id.isroot);
         appList = (TextView) findViewById(R.id.appList);
+        any = (TextView) findViewById(R.id.any);
+        location = (TextView) findViewById(R.id.location);
+        gsmLocation = (TextView) findViewById(R.id.gsmorcdmalocation);
+        build = (TextView) findViewById(R.id.build);
 
         Log.e("zyr", "onCreate");
 
@@ -78,8 +110,67 @@ public class MainActivity extends Activity {
         language.setText(getLanguage());
         network.setText(getNetworkType());
         root.setText(String.valueOf(isRoot()));
+        any.setText("\n" + "imsi: " + DeviceUtil.getIMSI(this) + "\n\n"
+                + "number: " + DeviceUtil.getNumber(this) + "\n\n"
+                + "Sim Serial Number: " + DeviceUtil.getSimSerialNumber(this) + "\n\n"
+                + "Sim Country Iso: " + DeviceUtil.getSimCountryIso(this) + "\n\n"
+                + "Sim Operator: " + DeviceUtil.getSimOperator(this) + "\n\n"
+                + "Sim Operator Name: " + DeviceUtil.getSimOperatorName(this) + "\n\n"
+                + "Network Country Iso: " + DeviceUtil.getNetworkCountryIso(this) + "\n\n"
+                + "Network Operator: " + DeviceUtil.getNetworkOperator(this) + "\n\n"
+                + "Network Operator Name: " + DeviceUtil.getNetworkOperatorName(this) + "\n\n"
+                + "Phone Type: " + DeviceUtil.getPhoneType(this) + "\n\n"
+                + "Network Type: " + DeviceUtil.getNetworkType(this) + "\n\n"
+                + "Mac Address: " + DeviceUtil.getMacAddress(this) + "\n\n"
+                + "BSSID: " + DeviceUtil.getBSSID(this) + "\n\n"
+                + "SSID: " + DeviceUtil.getSSID(this) + "\n\n"
+                + "Blue Name: " + DeviceUtil.getBlueName(this) + "\n\n"
+                + "Blue Mac: " + DeviceUtil.getBlueMac() + "\n\n"
+                + "Sim State: " + DeviceUtil.getSimState(this) + "\n\n"
+                + "has Icc Card: " + DeviceUtil.hasIccCard(this) + "\n\n"
+                + "Radio Version: " + DeviceUtil.getRadioVersion(this) + "\n\n"
+                + "Android ID: " + DeviceUtil.getAndroidID(this) );
+//                + "Cdma Location: " + DeviceUtil.getCdmaLocation(this).getBaseStationLatitude() + "-" + DeviceUtil.getCdmaLocation(this).getBaseStationLongitude());
+        if (DeviceUtil.getLocaltion(this) != null) {
+            location.setText("Localtion: " + DeviceUtil.getLocaltion(this).getLatitude() + "-" + DeviceUtil.getLocaltion(this).getLongitude() + "\n\n");
+        }
+        if (DeviceUtil.getPhoneType(this) == PHONE_TYPE_GSM){
+            gsmLocation.setText("gsmLocaltion: " + DeviceUtil.getGsmLocaltion(this).getLac() + "-" + DeviceUtil.getGsmLocaltion(this).getCid());
+        }
+        if (DeviceUtil.getPhoneType(this) == PHONE_TYPE_CDMA && DeviceUtil.getCdmaLocation(this) != null){
+            gsmLocation.setText("Cdma Location: " + DeviceUtil.getCdmaLocation(this).getBaseStationLatitude() + "-" + DeviceUtil.getCdmaLocation(this).getBaseStationLongitude());
+        }
+
+        build.setText("apilevel: " + Build.VERSION.SDK_INT + "\n\n"
+                + "version: " + Build.VERSION.RELEASE + "\n\n"
+                + "fingerprint: " + Build.FINGERPRINT + "\n\n"
+                + "display: " + Build.DISPLAY + "\n\n"
+                + "product: " + Build.PRODUCT + "\n\n"
+                + "id: " + Build.ID + "\n\n"
+                + "device: " + Build.DEVICE + "\n\n"
+                + "serial: " + Build.SERIAL + "\n\n"
+                + "board: " + Build.BOARD + "\n\n"
+                + "brand: " + Build.BRAND + "\n\n"
+                + "manufacturer: " + Build.MANUFACTURER + "\n\n"
+                + "model: " + Build.MODEL + "\n\n"
+                + "hardware: " + Build.HARDWARE + "\n\n"
+        );
         appList.setText(getInstalledApps().toString());
     }
+
+/*    @Override
+    protected void onResume() {
+        super.onResume();
+        MobclickAgent.onPageStart(mPageName);
+        MobclickAgent.onResume(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPageEnd(mPageName);
+        MobclickAgent.onPause(this);
+    }*/
 
     /** 判断是否具有ROOT权限 ,此方法对有些手机无效，比如小米系列 */
     private boolean isRoot() {
@@ -129,20 +220,6 @@ public class MainActivity extends Activity {
         return language;
     }
 
-    private void getLocation() {
-//        Location location;
-//        try {
-//            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-//
-//            List<String> matchingProviders = locationManager.getAllProviders();
-//            for (String prociderString : matchingProviders) {
-//                location = locationManager.getLastKnownLocation(prociderString);
-//                if (location != null)
-//                    break;
-//            }
-//        } catch (Throwable e) {
-//        }
-    }
 
     public DisplayMetrics getResolution() {
         DisplayMetrics displaysMetrics = new DisplayMetrics();
@@ -191,6 +268,4 @@ public class MainActivity extends Activity {
         }
         return appNameList;
     }
-
-    private native boolean isRootByNative();
 }

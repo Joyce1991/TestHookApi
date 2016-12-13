@@ -23,7 +23,6 @@ MSConfig(MSFilterLibrary, "libc.so")
 // 保留原来的地址（就是MSHookFunction调用后会把原来的地址保存在了这里）
 int (*open)(const char*, int, ...);
 int hookopen(const char* pathname, int flags, ...){
-    LOGI("method hooked");
     char *su_1 = "/system/app/Superuser.apk";
     char *su_2 = "/sbin/su";
     char *su_3 = "/system/bin/su";
@@ -44,8 +43,8 @@ int hookopen(const char* pathname, int flags, ...){
 }
 
 MSInitialize {
-    LOGI("Substrate initialized.");
-    MSImageRef image;
+//    LOGI("Substrate initialized.");
+/*    MSImageRef image;
     image = MSGetImageByName("/system/lib/libc.so"); //载入lib
     if (image != NULL){
         //注意这个是个c++函数，可以通过objdump来获取
@@ -53,12 +52,12 @@ MSInitialize {
         if(openload==NULL){
             LOGE("error find open ");
         } else{
-            LOGI("find open from libc.so");
+//            LOGI("find open from libc.so");
             MSHookFunction(openload, (void*)&hookopen,(void**)&open);
         }
     } else{
         LOGE("error find libc.so");
-    }
+    }*/
 }
 
 

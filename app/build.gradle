@@ -46,4 +46,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile files('libs/substrate-api.jar')
     compile files('libs/android-support-v4.jar')
+
+    compile 'com.umeng.analytics:analytics:latest.integration'
 }
